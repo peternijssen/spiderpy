@@ -1,7 +1,9 @@
 """ Python wrapper for the IthoDaalderop API """
 
 from datetime import datetime, timedelta
+from random import randint
 
+import json
 import requests
 
 BASE_URL = 'https://mijn.ithodaalderop.nl'
@@ -79,7 +81,7 @@ class IthoDaalderop_API(object):
         }
 
         response = requests.request(
-            'GET', DEVICES_URL, headers={**headers})
+            'GET', DEVICES_URL, headers=headers)
 
         if response.status_code == 401:
             self._refresh_access_token()
@@ -92,6 +94,35 @@ class IthoDaalderop_API(object):
 
         return thermostats
 
+    def set_temperature(self, thermostat, temperature):
+        """ Set the temperature. Unfortunately, the API requires the complete object"""
+
+        self._is_token_expired()
+
+        for key, prop in enumerate(thermostat['properties']):
+            if prop['id'] == 'SetpointTemperature':
+                thermostat['properties'][key]['status'] = temperature
+                thermostat['properties'][key]['statusModified'] = True
+                thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
+
+        thermostat['_etag'] = randint(10000000, 99999999)
+        headers = {
+            'authorization': 'Bearer ' + self._access_token,
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request(
+            'PUT', DEVICES_URL + "/" + thermostat['id'], data=json.dumps(thermostat), headers=headers)
+
+        if response.status_code == 401:
+            self._refresh_access_token()
+            self.set_temperature(thermostat, temperature)
+
+        if response.status_code != 200:
+            return False
+
+        return True
+
     def get_powerplugs(self):
         """ Retrieve powerplugs """
 
@@ -102,7 +133,7 @@ class IthoDaalderop_API(object):
         }
 
         response = requests.request(
-            'GET', DEVICES_URL, headers={**headers})
+            'GET', DEVICES_URL, headers=headers)
 
         if response.status_code == 401:
             self._refresh_access_token()

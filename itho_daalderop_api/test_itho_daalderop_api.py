@@ -23,6 +23,8 @@ def main():
     print("Listing thermostats:")
     for thermostat in thermostats:
         print(thermostat['id'])
+        print("Set temperature to 19 degrees")
+        ithodaalderop.set_temperature(thermostat, 19)
 
     # Get powerplugs
     print("Get powerplugs")
