@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(name='itho_daalderop_api',
-      version='1.0.1',
+      version='1.0.2',
       description='Python wrapper for the Itho Daalderop API, a way to manage your Spider installation',
       url='https://www.github.com/ptnijssen/python-itho-daalderop-api/',
       author='Peter Nijssen',

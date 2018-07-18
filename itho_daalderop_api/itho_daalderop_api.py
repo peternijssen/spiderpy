@@ -83,7 +83,7 @@ class IthoDaalderop_API(object):
         """ Retrieve thermostats """
 
         self._is_token_expired()
-        
+
         headers = {
             'authorization': 'Bearer ' + self._access_token,
             'Content-Type': 'application/json'
