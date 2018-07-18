@@ -1,9 +1,10 @@
 """ Python wrapper for the IthoDaalderop API """
 
+import json
 from datetime import datetime, timedelta
 from random import randint
+from urllib.parse import unquote
 
-import json
 import requests
 
 BASE_URL = 'https://mijn.ithodaalderop.nl'
@@ -25,6 +26,10 @@ class IthoDaalderop_API(object):
         self._user = user
         self._password = password
 
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+
         payload = {
             'grant_type': 'password',
             'username': self._user,
@@ -33,17 +38,17 @@ class IthoDaalderop_API(object):
 
         try:
             response = requests.request(
-                'POST', AUTHENTICATE_URL, data=payload)
+                'POST', AUTHENTICATE_URL, data=payload, headers=headers)
             data = response.json()
 
         except Exception:
-            raise(UnauthorizedException())
+            raise (UnauthorizedException())
 
         if 'error' in data:
             raise UnauthorizedException(data['error'])
 
         self._access_token = data['access_token']
-        self._refresh_token = data['refresh_token']
+        self._refresh_token = unquote(data['refresh_token'])
         self._token_expires_in = data['expires_in']
         self._token_expires_at = datetime.now(
         ) + timedelta(0, data['expires_in'])
@@ -59,25 +64,29 @@ class IthoDaalderop_API(object):
     def _refresh_access_token(self):
         """ Refresh access_token """
 
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
         payload = {
             'grant_type': 'refresh_token',
             'refresh_token': self._refresh_token
         }
 
         response = requests.request(
-            'POST', AUTHENTICATE_URL, data=payload)
+            'POST', AUTHENTICATE_URL, data=payload, headers=headers)
 
         data = response.json()
-
         self._access_token = data['access_token']
 
     def get_thermostats(self):
         """ Retrieve thermostats """
 
         self._is_token_expired()
-
+        
         headers = {
-            'authorization': 'Bearer ' + self._access_token
+            'authorization': 'Bearer ' + self._access_token,
+            'Content-Type': 'application/json'
         }
 
         response = requests.request(
@@ -129,7 +138,8 @@ class IthoDaalderop_API(object):
         self._is_token_expired()
 
         headers = {
-            'authorization': 'Bearer ' + self._access_token
+            'authorization': 'Bearer ' + self._access_token,
+            'Content-Type': 'application/json'
         }
 
         response = requests.request(
