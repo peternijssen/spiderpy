@@ -26,11 +26,21 @@ def main():
         print("Set temperature to 19 degrees")
         ithodaalderop.set_temperature(thermostat, 19)
 
+    print("Retrieve from cache")
+    thermostats = ithodaalderop.get_thermostats(False)
+    for thermostat in thermostats:
+        print(thermostat['id'])
+
     # Get powerplugs
     print("Get powerplugs")
     powerplugs = ithodaalderop.get_powerplugs()
     print("Number of powerplugs: ", len(powerplugs))
     print("Listing powerplugs:")
+    for powerplug in powerplugs:
+        print(powerplug['id'])
+
+    print("Retrieve from cache")
+    powerplugs = ithodaalderop.get_powerplugs(False)
     for powerplug in powerplugs:
         print(powerplug['id'])
 

@@ -25,6 +25,8 @@ class IthoDaalderop_API(object):
 
         self._user = user
         self._password = password
+        self._thermostats = None
+        self._powerplugs = None
 
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -79,8 +81,11 @@ class IthoDaalderop_API(object):
         data = response.json()
         self._access_token = data['access_token']
 
-    def get_thermostats(self):
+    def get_thermostats(self, force_refresh=True):
         """ Retrieve thermostats """
+
+        if self._thermostats is not None and force_refresh is False:
+            return self._thermostats
 
         self._is_token_expired()
 
@@ -99,9 +104,9 @@ class IthoDaalderop_API(object):
             thermostats = response.json()
 
         # 105 == Spider thermostat
-        thermostats = [x for x in thermostats if x['type'] == 105]
+        self._thermostats = [x for x in thermostats if x['type'] == 105]
 
-        return thermostats
+        return self._thermostats
 
     def set_temperature(self, thermostat, temperature):
         """ Set the temperature. Unfortunately, the API requires the complete object"""
@@ -132,8 +137,11 @@ class IthoDaalderop_API(object):
 
         return True
 
-    def get_powerplugs(self):
+    def get_powerplugs(self, force_refresh=False):
         """ Retrieve powerplugs """
+
+        if self._powerplugs is not None and force_refresh is False:
+            return self._powerplugs
 
         self._is_token_expired()
 
@@ -152,6 +160,6 @@ class IthoDaalderop_API(object):
             powerplugs = response.json()
 
         # 105 == Spider powerplug
-        powerplugs = [x for x in powerplugs if x['type'] == 103]
+        self._powerplugs = [x for x in powerplugs if x['type'] == 103]
 
-        return powerplugs
+        return self._powerplugs
