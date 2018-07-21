@@ -137,6 +137,35 @@ class IthoDaalderop_API(object):
 
         return True
 
+    def set_operation_mode(self, thermostat, mode):
+        """ Set the temperature. Unfortunately, the API requires the complete object"""
+
+        self._is_token_expired()
+
+        for key, prop in enumerate(thermostat['properties']):
+            if prop['id'] == 'OperationMode':
+                thermostat['properties'][key]['status'] = mode[0].upper() + mode[1:]
+                thermostat['properties'][key]['statusModified'] = True
+                thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
+
+        thermostat['_etag'] = randint(10000000, 99999999)
+        headers = {
+            'authorization': 'Bearer ' + self._access_token,
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request(
+            'PUT', DEVICES_URL + "/" + thermostat['id'], data=json.dumps(thermostat), headers=headers)
+
+        if response.status_code == 401:
+            self._refresh_access_token()
+            self.set_operation_mode(thermostat, mode)
+
+        if response.status_code != 200:
+            return False
+
+        return True
+
     def get_powerplugs(self, force_refresh=False):
         """ Retrieve powerplugs """
 

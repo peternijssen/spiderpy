@@ -25,6 +25,8 @@ def main():
         print(thermostat['id'])
         print("Set temperature to 19 degrees")
         ithodaalderop.set_temperature(thermostat, 19)
+        print("Set to cool")
+        ithodaalderop.set_operation_mode(thermostat, 'cool')
 
     print("Retrieve from cache")
     thermostats = ithodaalderop.get_thermostats(False)
