@@ -1,5 +1,11 @@
 """ Python wrapper for the Spider API """
 
+# TODO:
+# - Rewrite access token handling
+# - Catch API errors at all places
+# - Redo retrieving todays energy usage from Power Plug
+# - Power plug energy usage should set the timezone to UTC probably
+
 import json
 from datetime import datetime, timedelta
 from urllib.parse import unquote
@@ -15,6 +21,7 @@ AUTHENTICATE_URL = BASE_URL + '/api/tokens'
 DEVICES_URL = BASE_URL + '/api/devices'
 ENERGY_DEVICES_URL = BASE_URL + '/api/devices/energy/energyDevices'
 POWER_PLUGS_URL = BASE_URL + '/api/devices/energy/smartPlugs'
+ENERGY_MONITORING_URL = BASE_URL + '/api/monitoring/15/devices'
 
 
 class SpiderApi(object):
@@ -191,6 +198,13 @@ class SpiderApi(object):
 
         for power_plug in power_plugs:
             if power_plug['isSwitch']:
+                today = datetime.today().replace(hour=00, minute=00).strftime('%s')
+
+                resp = requests.request(
+                    'GET', ENERGY_MONITORING_URL + "/" + power_plug['id'] + "/?take=96&start=" + str(today) + "000", headers=headers)
+                data = resp.json()
+
+                power_plug['todayUsage'] = float(data[0]['totalEnergy']['normal']) + float(data[0]['totalEnergy']['low'])
                 self._power_plugs.append(SpiderPowerPlug(power_plug, self))
 
         return self._power_plugs

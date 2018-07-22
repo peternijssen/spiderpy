@@ -18,17 +18,17 @@ def main():
     api = SpiderApi(username, password)
 
     # Get thermostats
-    # print("Get thermostats")
+    print("Get thermostats")
     thermostats = api.get_thermostats()
     print("Number of thermostats: ", len(thermostats))
     print("Listing thermostats:")
     for thermostat in thermostats:
-        print(thermostat.id)
-        print(thermostat.name)
-        print(thermostat.current_temperature)
-        print(thermostat.target_temperature)
-        print(thermostat.minimum_temperature)
-        print(thermostat.maximum_temperature)
+        print("ID: " + thermostat.id)
+        print("Name: " + thermostat.name)
+        print("Current Temperature: " + str(thermostat.current_temperature))
+        print("Target Temperature: " + str(thermostat.target_temperature))
+        print("Minimum Temperature: " + str(thermostat.minimum_temperature))
+        print("Maximum Temperature: " + str(thermostat.maximum_temperature))
         print("Set temperature to 19 degrees")
         thermostat.set_temperature(17)
         print("Set to cool")
@@ -37,7 +37,7 @@ def main():
     print("Retrieve from cache")
     thermostats = api.get_thermostats(False)
     for thermostat in thermostats:
-        print(thermostat.id)
+        print("ID: " + thermostat.id)
 
     # Get power plugs
     print("Get power plugs")
@@ -45,17 +45,18 @@ def main():
     print("Number of power plugs: ", len(power_plugs))
     print("Listing power plugs:")
     for power_plug in power_plugs:
-        print(power_plug.id)
-        print(power_plug.name)
-        print(power_plug.is_on)
-        print(power_plug.current_energy_consumption)
+        print("ID: " + power_plug.id)
+        print("Name: " + power_plug.name)
+        print("Enabled: " + str(power_plug.is_on))
+        print("Current Energy Consumption: " + str(power_plug.current_energy_consumption))
+        print("Todays Energy Consumption: " + str(power_plug.today_energy_consumption))
         print("Turn on the power plug")
         power_plug.turn_on()
 
     print("Retrieve from cache")
     power_plugs = api.get_power_plugs(False)
     for power_plug in power_plugs:
-        print(power_plug.id)
+        print("ID: " + power_plug.id)
 
 
 if __name__ == '__main__':

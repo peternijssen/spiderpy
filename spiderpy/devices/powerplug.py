@@ -11,6 +11,10 @@ class SpiderPowerPlug(SpiderDevice):
     def current_energy_consumption(self):
         return self.data.get('currentUsage')
 
+    @property
+    def today_energy_consumption(self):
+        return self.data.get('todayUsage')
+
     def turn_on(self):
         self.api.turn_power_plug_on(self.id)
 
