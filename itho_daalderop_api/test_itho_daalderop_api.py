@@ -1,4 +1,5 @@
 import argparse
+
 from itho_daalderop_api import IthoDaalderop_API
 
 
@@ -45,6 +46,7 @@ def main():
     powerplugs = ithodaalderop.get_powerplugs(False)
     for powerplug in powerplugs:
         print(powerplug['id'])
+
 
 if __name__ == '__main__':
     main()
