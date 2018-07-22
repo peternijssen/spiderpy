@@ -1,24 +1,24 @@
-""" Python wrapper for the IthoDaalderop API """
+""" Python wrapper for the Spider API """
 
 import json
 from datetime import datetime, timedelta
-from random import randint
 from urllib.parse import unquote
 
 import requests
+
+from spiderpy.devices.powerplug import SpiderPowerPlug
+from spiderpy.devices.thermostat import SpiderThermostat
 
 BASE_URL = 'https://mijn.ithodaalderop.nl'
 
 AUTHENTICATE_URL = BASE_URL + '/api/tokens'
 DEVICES_URL = BASE_URL + '/api/devices'
+ENERGY_DEVICES_URL = BASE_URL + '/api/devices/energy/energyDevices'
+POWER_PLUGS_URL = BASE_URL + '/api/devices/energy/smartPlugs'
 
 
-class UnauthorizedException(Exception):
-    pass
-
-
-class IthoDaalderop_API(object):
-    """ Interface class for the IthoDaalderop API """
+class SpiderApi(object):
+    """ Interface class for the Spider API """
 
     def __init__(self, user, password):
         """ Constructor """
@@ -26,7 +26,7 @@ class IthoDaalderop_API(object):
         self._user = user
         self._password = password
         self._thermostats = None
-        self._powerplugs = None
+        self._power_plugs = None
 
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -52,12 +52,11 @@ class IthoDaalderop_API(object):
         self._access_token = data['access_token']
         self._refresh_token = unquote(data['refresh_token'])
         self._token_expires_in = data['expires_in']
-        self._token_expires_at = datetime.now(
-        ) + timedelta(0, data['expires_in'])
+        self._token_expires_at = datetime.now() + timedelta(0, data['expires_in'])
 
     def _is_token_expired(self):
         """ Check if access token is expired """
-        if (datetime.now() > self._token_expires_at):
+        if datetime.now() > self._token_expires_at:
             self._refresh_access_token()
             return True
 
@@ -88,6 +87,7 @@ class IthoDaalderop_API(object):
             return self._thermostats
 
         self._is_token_expired()
+        self._thermostats = []
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
@@ -103,8 +103,9 @@ class IthoDaalderop_API(object):
         else:
             thermostats = response.json()
 
-        # 105 == Spider thermostat
-        self._thermostats = [x for x in thermostats if x['type'] == 105]
+        for thermostat in thermostats:
+            if thermostat['type'] == 105:
+                self._thermostats.append(SpiderThermostat(thermostat, self))
 
         return self._thermostats
 
@@ -114,12 +115,12 @@ class IthoDaalderop_API(object):
         self._is_token_expired()
 
         for key, prop in enumerate(thermostat['properties']):
+            # noinspection SpellCheckingInspection
             if prop['id'] == 'SetpointTemperature':
                 thermostat['properties'][key]['status'] = temperature
                 thermostat['properties'][key]['statusModified'] = True
                 thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
 
-        thermostat['_etag'] = randint(10000000, 99999999)
         headers = {
             'authorization': 'Bearer ' + self._access_token,
             'Content-Type': 'application/json'
@@ -148,7 +149,6 @@ class IthoDaalderop_API(object):
                 thermostat['properties'][key]['statusModified'] = True
                 thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
 
-        thermostat['_etag'] = randint(10000000, 99999999)
         headers = {
             'authorization': 'Bearer ' + self._access_token,
             'Content-Type': 'application/json'
@@ -166,11 +166,37 @@ class IthoDaalderop_API(object):
 
         return True
 
-    def get_powerplugs(self, force_refresh=False):
-        """ Retrieve powerplugs """
+    def get_power_plugs(self, force_refresh=False):
+        """ Retrieve power plugs """
 
-        if self._powerplugs is not None and force_refresh is False:
-            return self._powerplugs
+        if self._power_plugs is not None and force_refresh is False:
+            return self._power_plugs
+
+        self._is_token_expired()
+        self._power_plugs = []
+
+        headers = {
+            'authorization': 'Bearer ' + self._access_token,
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request(
+            'GET', ENERGY_DEVICES_URL, headers=headers)
+
+        if response.status_code == 401:
+            self._refresh_access_token()
+            power_plugs = self.get_power_plugs()
+        else:
+            power_plugs = response.json()
+
+        for power_plug in power_plugs:
+            if power_plug['isSwitch']:
+                self._power_plugs.append(SpiderPowerPlug(power_plug, self))
+
+        return self._power_plugs
+
+    def turn_power_plug_on(self, power_plug_id):
+        """ Turn the power_plug on"""
 
         self._is_token_expired()
 
@@ -180,15 +206,45 @@ class IthoDaalderop_API(object):
         }
 
         response = requests.request(
-            'GET', DEVICES_URL, headers=headers)
+            'PUT', POWER_PLUGS_URL + power_plug_id + "/switch", data="true",
+            headers=headers)
 
         if response.status_code == 401:
             self._refresh_access_token()
-            powerplugs = self.get_powerplugs()
-        else:
-            powerplugs = response.json()
+            self.turn_power_plug_on(power_plug_id)
 
-        # 105 == Spider powerplug
-        self._powerplugs = [x for x in powerplugs if x['type'] == 103]
+        if response.status_code != 200:
+            return False
 
-        return self._powerplugs
+        return True
+
+    def turn_power_plug_off(self, power_plug_id):
+        """ Turn the power plug off"""
+
+        self._is_token_expired()
+
+        headers = {
+            'authorization': 'Bearer ' + self._access_token,
+            'Content-Type': 'application/json'
+        }
+
+        response = requests.request(
+            'PUT', POWER_PLUGS_URL + power_plug_id + "/switch", data="false",
+            headers=headers)
+
+        if response.status_code == 401:
+            self._refresh_access_token()
+            self.turn_power_plug_on(power_plug_id)
+
+        if response.status_code != 200:
+            return False
+
+        return True
+
+
+class UnauthorizedException(Exception):
+    pass
+
+
+class SpiderApiException(Exception):
+    pass
