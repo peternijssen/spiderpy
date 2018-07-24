@@ -48,7 +48,7 @@ class SpiderThermostat(SpiderDevice):
     def maximum_temperature(self):
         for prop in self.data.get('properties'):
             if prop['id'] == 'SetpointTemperature':
-                return float(prop['step'])
+                return float(prop['max'])
 
         return 0.0
 
@@ -56,7 +56,7 @@ class SpiderThermostat(SpiderDevice):
     def temperature_steps(self):
         for prop in self.data.get('properties'):
             if prop['id'] == 'SetpointTemperature':
-                return float(prop['max'])
+                return float(prop['step'])
 
         return 0.0
 

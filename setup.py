@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
       name='spiderpy',
-      version='1.0.6',
+      version='1.0.7',
       description='Python wrapper for the Spider API, a way to manage your Spider installation',
       long_description=long_description,
       long_description_content_type="text/markdown",
