@@ -8,6 +8,10 @@ class SpiderPowerPlug(SpiderDevice):
         return self.data.get('isSwitchedOn')
 
     @property
+    def is_available(self):
+        return self.data.get('isSwitchable')
+
+    @property
     def current_energy_consumption(self):
         return self.data.get('currentUsage')
 

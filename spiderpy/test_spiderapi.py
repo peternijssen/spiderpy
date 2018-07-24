@@ -1,6 +1,6 @@
 import argparse
 
-from spiderpy.spiderapi import SpiderApi
+from spiderpy import SpiderApi
 
 
 def main():
@@ -25,6 +25,7 @@ def main():
     for thermostat in thermostats:
         print("ID: " + thermostat.id)
         print("Name: " + thermostat.name)
+        print("Operation mode: " + thermostat.operation_mode)
         print("Current Temperature: " + str(thermostat.current_temperature))
         print("Target Temperature: " + str(thermostat.target_temperature))
         print("Minimum Temperature: " + str(thermostat.minimum_temperature))
@@ -48,6 +49,7 @@ def main():
         print("ID: " + power_plug.id)
         print("Name: " + power_plug.name)
         print("Enabled: " + str(power_plug.is_on))
+        print("Available: " + str(power_plug.is_available))
         print("Current Energy Consumption: " + str(power_plug.current_energy_consumption))
         print("Todays Energy Consumption: " + str(power_plug.today_energy_consumption))
         print("Turn on the power plug")

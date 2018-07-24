@@ -5,6 +5,14 @@ from spiderpy.devices.base import SpiderDevice
 class SpiderThermostat(SpiderDevice):
 
     @property
+    def operation_mode(self):
+        for prop in self.data.get('properties'):
+            if prop['id'] == 'OperationMode':
+                return prop['status']
+
+        return "Idle"
+
+    @property
     def has_operation_mode(self):
         for prop in self.data.get('properties'):
             if prop['id'] == 'OperationMode':
