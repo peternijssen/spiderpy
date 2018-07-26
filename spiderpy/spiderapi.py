@@ -100,7 +100,7 @@ class SpiderApi(object):
     def update_thermostats(self):
         """ Retrieve thermostats """
         self._is_token_expired()
-        self._thermostats = []
+        thermostats = []
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
@@ -114,11 +114,13 @@ class SpiderApi(object):
             self._refresh_access_token()
             self.update_thermostats()
         else:
-            thermostats = response.json()
+            results = response.json()
 
-            for thermostat in thermostats:
+            for thermostat in results:
                 if thermostat['type'] == 105:
-                    self._thermostats.append(SpiderThermostat(thermostat, self))
+                    thermostats.append(SpiderThermostat(thermostat, self))
+
+        self._thermostats = thermostats
 
     def get_thermostats(self):
         """ Get all thermostats """
@@ -196,7 +198,7 @@ class SpiderApi(object):
     def update_power_plugs(self):
         """ Retrieve power plugs """
         self._is_token_expired()
-        self._power_plugs = []
+        power_plugs = []
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
@@ -210,9 +212,9 @@ class SpiderApi(object):
             self._refresh_access_token()
             self.update_power_plugs()
         else:
-            power_plugs = response.json()
+            results = response.json()
 
-            for power_plug in power_plugs:
+            for power_plug in results:
                 if power_plug['isSwitch']:
                     today = datetime.today().replace(hour=00, minute=00).strftime('%s')
 
@@ -223,7 +225,9 @@ class SpiderApi(object):
 
                     power_plug['todayUsage'] = float(data[0]['totalEnergy']['normal']) + float(
                         data[0]['totalEnergy']['low'])
-                    self._power_plugs.append(SpiderPowerPlug(power_plug, self))
+                    power_plugs.append(SpiderPowerPlug(power_plug, self))
+
+        self._power_plugs = power_plugs
 
     def get_power_plugs(self):
         """ Get all power plugs """
