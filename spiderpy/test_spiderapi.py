@@ -1,4 +1,5 @@
 import argparse
+import time
 
 from spiderpy import SpiderApi
 
@@ -15,7 +16,7 @@ def main():
     args = parser.parse_args()
     username = args.username
     password = args.password
-    api = SpiderApi(username, password)
+    api = SpiderApi(username, password, 5)
 
     # Get thermostats
     print("Get thermostats")
@@ -36,9 +37,11 @@ def main():
         thermostat.set_operation_mode('Cool')
 
     print("Retrieve from cache")
-    thermostats = api.get_thermostats(False)
+    thermostats = api.get_thermostats()
     for thermostat in thermostats:
         print("ID: " + thermostat.id)
+
+    time.sleep(10)
 
     # Get power plugs
     print("Get power plugs")
@@ -56,7 +59,7 @@ def main():
         power_plug.turn_on()
 
     print("Retrieve from cache")
-    power_plugs = api.get_power_plugs(False)
+    power_plugs = api.get_power_plugs()
     for power_plug in power_plugs:
         print("ID: " + power_plug.id)
 
