@@ -17,6 +17,7 @@ def main():
     username = args.username
     password = args.password
     api = SpiderApi(username, password, 5)
+    id = None
 
     # Get thermostats
     print("Get thermostats")
@@ -40,6 +41,11 @@ def main():
     thermostats = api.get_thermostats()
     for thermostat in thermostats:
         print("ID: " + thermostat.id)
+        id = thermostat.id
+
+    print("Retrieve by id")
+    thermostat = api.get_thermostat(id)
+    print("ID: " + thermostat.id)
 
     time.sleep(10)
 
@@ -62,7 +68,11 @@ def main():
     power_plugs = api.get_power_plugs()
     for power_plug in power_plugs:
         print("ID: " + power_plug.id)
+        id = power_plug.id
 
+    print("Retrieve by id")
+    power_plug = api.get_power_plug(id)
+    print("ID: " + power_plug.id)
 
 if __name__ == '__main__':
     main()

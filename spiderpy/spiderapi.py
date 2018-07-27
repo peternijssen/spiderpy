@@ -29,13 +29,18 @@ class SpiderApi(object):
 
         self._user = user
         self._password = password
-        self._thermostats = []
-        self._power_plugs = []
+        self._thermostats = {}
+        self._power_plugs = {}
         self._last_refresh = None
         self._refresh_rate = refresh_rate
+        self._login()
 
+    def _login(self):
         headers = {
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         payload = {
@@ -58,7 +63,7 @@ class SpiderApi(object):
         self._access_token = data['access_token']
         self._refresh_token = unquote(data['refresh_token'])
         self._token_expires_in = data['expires_in']
-        self._token_expires_at = datetime.now() + timedelta(0, data['expires_in'])
+        self._token_expires_at = datetime.now() + timedelta(0, (int(data['expires_in']) - 20))
 
     def _is_token_expired(self):
         """ Check if access token is expired """
@@ -73,6 +78,9 @@ class SpiderApi(object):
 
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         payload = {
@@ -84,10 +92,19 @@ class SpiderApi(object):
             'POST', AUTHENTICATE_URL, data=payload, headers=headers)
 
         data = response.json()
-        self._access_token = data['access_token']
+
+        if response.status_code != 200:
+            self._login()
+        else:
+            self._access_token = data['access_token']
+            self._refresh_token = unquote(data['refresh_token'])
+            self._token_expires_in = data['expires_in']
+            self._token_expires_at = datetime.now() + timedelta(0, (int(data['expires_in']) - 20))
 
     def update(self):
         """ Update the cache """
+        self._is_token_expired()
+
         current_time = int(time.time())
         last_refresh = 0 if self._last_refresh is None else self._last_refresh
 
@@ -99,12 +116,12 @@ class SpiderApi(object):
 
     def update_thermostats(self):
         """ Retrieve thermostats """
-        self._is_token_expired()
-        thermostats = []
-
         headers = {
             'authorization': 'Bearer ' + self._access_token,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         response = requests.request(
@@ -118,23 +135,20 @@ class SpiderApi(object):
 
             for thermostat in results:
                 if thermostat['type'] == 105:
-                    thermostats.append(SpiderThermostat(thermostat, self))
-
-        self._thermostats = thermostats
+                    self._thermostats[thermostat['id']] = SpiderThermostat(thermostat, self)
 
     def get_thermostats(self):
         """ Get all thermostats """
         self.update()
 
-        return self._thermostats
+        return self._thermostats.values()
 
     def get_thermostat(self, id):
         """ Get a thermostat by id """
         self.update()
 
-        for thermostat in self._thermostats:
-            if thermostat.id == id:
-                return thermostat
+        if id in self._thermostats:
+            return self._thermostats[id]
 
         return None
 
@@ -152,7 +166,10 @@ class SpiderApi(object):
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         response = requests.request(
@@ -180,7 +197,10 @@ class SpiderApi(object):
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         response = requests.request(
@@ -197,12 +217,12 @@ class SpiderApi(object):
 
     def update_power_plugs(self):
         """ Retrieve power plugs """
-        self._is_token_expired()
-        power_plugs = []
-
         headers = {
             'authorization': 'Bearer ' + self._access_token,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         response = requests.request(
@@ -225,23 +245,20 @@ class SpiderApi(object):
 
                     power_plug['todayUsage'] = float(data[0]['totalEnergy']['normal']) + float(
                         data[0]['totalEnergy']['low'])
-                    power_plugs.append(SpiderPowerPlug(power_plug, self))
-
-        self._power_plugs = power_plugs
+                    self._power_plugs[power_plug['id']] = (SpiderPowerPlug(power_plug, self))
 
     def get_power_plugs(self):
         """ Get all power plugs """
         self.update()
 
-        return self._power_plugs
+        return self._power_plugs.values()
 
     def get_power_plug(self, id):
         """ Get a power plug by id """
         self.update()
 
-        for power_plug in self._power_plugs:
-            if power_plug.id == id:
-                return power_plug
+        if id in self._power_plugs:
+            return self._power_plugs[id]
 
         return None
 
@@ -252,7 +269,10 @@ class SpiderApi(object):
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         response = requests.request(
@@ -275,7 +295,10 @@ class SpiderApi(object):
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-Client-Platform': 'android-phone',
+            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Library': 'SpiderPy'
         }
 
         response = requests.request(
