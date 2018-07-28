@@ -17,7 +17,7 @@ def main():
     username = args.username
     password = args.password
     api = SpiderApi(username, password, 5)
-    id = None
+    unique_id = None
 
     # Get thermostats
     print("Get thermostats")
@@ -33,7 +33,7 @@ def main():
         print("Minimum Temperature: " + str(thermostat.minimum_temperature))
         print("Maximum Temperature: " + str(thermostat.maximum_temperature))
         print("Set temperature to 19 degrees")
-        thermostat.set_temperature(17)
+        thermostat.set_temperature(19)
         print("Set to cool")
         thermostat.set_operation_mode('Cool')
 
@@ -41,10 +41,10 @@ def main():
     thermostats = api.get_thermostats()
     for thermostat in thermostats:
         print("ID: " + thermostat.id)
-        id = thermostat.id
+        unique_id = thermostat.id
 
     print("Retrieve by id")
-    thermostat = api.get_thermostat(id)
+    thermostat = api.get_thermostat(unique_id)
     print("ID: " + thermostat.id)
 
     time.sleep(10)
@@ -60,7 +60,7 @@ def main():
         print("Enabled: " + str(power_plug.is_on))
         print("Available: " + str(power_plug.is_available))
         print("Current Energy Consumption: " + str(power_plug.current_energy_consumption))
-        print("Todays Energy Consumption: " + str(power_plug.today_energy_consumption))
+        print("Today Energy Consumption: " + str(power_plug.today_energy_consumption))
         print("Turn on the power plug")
         power_plug.turn_on()
 
@@ -68,11 +68,12 @@ def main():
     power_plugs = api.get_power_plugs()
     for power_plug in power_plugs:
         print("ID: " + power_plug.id)
-        id = power_plug.id
+        unique_id = power_plug.id
 
     print("Retrieve by id")
-    power_plug = api.get_power_plug(id)
+    power_plug = api.get_power_plug(unique_id)
     print("ID: " + power_plug.id)
+
 
 if __name__ == '__main__':
     main()
