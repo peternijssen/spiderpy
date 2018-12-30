@@ -108,6 +108,18 @@ class SpiderApi(object):
         url = DEVICES_URL + "/" + thermostat['id']
         return self._request_action(url, json.dumps(thermostat))
 
+    def set_fan_speed(self, thermostat, fanspeed):
+        """ Set the fanspeed. Unfortunately, the API requires the complete object"""
+        for key, prop in enumerate(thermostat['properties']):
+            # noinspection SpellCheckingInspection
+            if prop['id'] == 'FanSpeed':
+                thermostat['properties'][key]['status'] = fanspeed[0].upper() + fanspeed[1:]
+                thermostat['properties'][key]['statusModified'] = True
+                thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
+
+        url = DEVICES_URL + "/" + thermostat['id']
+        return self._request_action(url, json.dumps(thermostat))
+
     def update_power_plugs(self):
         """ Retrieve power plugs """
         results = self._request_update(ENERGY_DEVICES_URL)
