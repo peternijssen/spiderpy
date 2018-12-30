@@ -22,3 +22,7 @@ This library is being used in [Home Assistant](https://www.home-assistant.io/com
 
 ## More information about Spider (Dutch)
 [http://www.ithodaalderop.nl/spider-thermostaat/wat-is-spider](http://www.ithodaalderop.nl/spider-thermostaat/wat-is-spider)
+
+## Contributors
+* [Peter Nijssen](https://github.com/peternijssen)
+* [Stefan Oude Vrielink](https://github.com/soudevrielink)
