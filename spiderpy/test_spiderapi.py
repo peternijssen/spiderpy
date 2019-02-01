@@ -33,7 +33,7 @@ def main():
         print("Minimum Temperature: " + str(thermostat.minimum_temperature))
         print("Maximum Temperature: " + str(thermostat.maximum_temperature))
         print("Set temperature to 19 degrees")
-        thermostat.set_temperature(19)
+        thermostat.set_temperature(17)
         print("Set to cool")
         thermostat.set_operation_mode('Cool')
 
@@ -43,13 +43,15 @@ def main():
         print("ID: " + thermostat.id)
         unique_id = thermostat.id
 
-    print("Retrieve by id")
-    thermostat = api.get_thermostat(unique_id)
-    print("ID: " + thermostat.id)
+    if unique_id is not None:
+        print("Retrieve by id")
+        thermostat = api.get_thermostat(unique_id)
+        print("ID: " + thermostat.id)
 
     time.sleep(10)
 
     # Get power plugs
+    unique_id = None
     print("Get power plugs")
     power_plugs = api.get_power_plugs()
     print("Number of power plugs: ", len(power_plugs))
@@ -70,9 +72,10 @@ def main():
         print("ID: " + power_plug.id)
         unique_id = power_plug.id
 
-    print("Retrieve by id")
-    power_plug = api.get_power_plug(unique_id)
-    print("ID: " + power_plug.id)
+    if unique_id is not None:
+        print("Retrieve by id")
+        power_plug = api.get_power_plug(unique_id)
+        print("ID: " + power_plug.id)
 
 
 if __name__ == '__main__':

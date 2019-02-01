@@ -48,7 +48,6 @@ class SpiderApi(object):
 
     def update(self):
         """ Update the cache """
-        self._is_token_expired()
 
         current_time = int(time.time())
         last_refresh = 0 if self._last_refresh is None else self._last_refresh
