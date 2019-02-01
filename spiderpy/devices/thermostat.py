@@ -69,12 +69,15 @@ class SpiderThermostat(SpiderDevice):
         return "Idle"
 
     def set_temperature(self, temperature):
-        self.api.set_temperature(self.data, temperature)
+        if self.is_online is True:
+            self.api.set_temperature(self.data, temperature)
 
     def set_operation_mode(self, operation):
         """ Set the operation mode. Either 'Heat' or 'Cool'"""
-        self.api.set_operation_mode(self.data, operation)
+        if self.is_online is True:
+            self.api.set_operation_mode(self.data, operation)
 
     def set_fan_speed(self, fanspeed):
         """ Set the fanspeed. Either 'Auto', 'Low', 'Medium', 'High', 'Boost 10', 'Boost 20', 'Boost 30'"""
-        self.api.set_fan_speed(self.data, fanspeed)
+        if self.is_online is True:
+            self.api.set_fan_speed(self.data, fanspeed)

@@ -32,7 +32,7 @@ def main():
         print("Target Temperature: " + str(thermostat.target_temperature))
         print("Minimum Temperature: " + str(thermostat.minimum_temperature))
         print("Maximum Temperature: " + str(thermostat.maximum_temperature))
-        print("Set temperature to 19 degrees")
+        print("Set temperature to 17 degrees")
         thermostat.set_temperature(17)
         print("Set to cool")
         thermostat.set_operation_mode('Cool')

@@ -20,9 +20,11 @@ class SpiderPowerPlug(SpiderDevice):
         return self.data.get('todayUsage')
 
     def turn_on(self):
-        self.data['isSwitchedOn'] = True
-        self.api.turn_power_plug_on(self.id)
+        if self.is_online is True:
+            self.data['isSwitchedOn'] = True
+            self.api.turn_power_plug_on(self.id)
 
     def turn_off(self):
-        self.data['isSwitchedOn'] = False
-        self.api.turn_power_plug_off(self.id)
+        if self.is_online is True:
+            self.data['isSwitchedOn'] = False
+            self.api.turn_power_plug_off(self.id)
