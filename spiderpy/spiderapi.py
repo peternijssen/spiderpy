@@ -46,6 +46,13 @@ class SpiderApi(object):
 
         return False
 
+    def _reset_status_modified(self, thermostat):
+        """ Reset all statusModified to false """
+        for key, prop in enumerate(thermostat['properties']):
+            # noinspection SpellCheckingInspection
+            if thermostat['properties'][key].get('statusModified', False) == True:
+                thermostat['properties'][key]['statusModified'] = False
+
     def update(self):
         """ Update the cache """
 
@@ -86,6 +93,7 @@ class SpiderApi(object):
 
     def set_temperature(self, thermostat, temperature):
         """ Set the temperature. Unfortunately, the API requires the complete object"""
+        self._reset_status_modified(thermostat) # Make sure only temperature will be modified
         for key, prop in enumerate(thermostat['properties']):
             # noinspection SpellCheckingInspection
             if prop['id'] == 'SetpointTemperature':
@@ -98,9 +106,23 @@ class SpiderApi(object):
 
     def set_operation_mode(self, thermostat, mode):
         """ Set the operation mode. Unfortunately, the API requires the complete object"""
+        self._reset_status_modified(thermostat) # Make sure only operation mode will be modified
         for key, prop in enumerate(thermostat['properties']):
             if prop['id'] == 'OperationMode':
                 thermostat['properties'][key]['status'] = mode[0].upper() + mode[1:]
+                thermostat['properties'][key]['statusModified'] = True
+                thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
+
+        url = DEVICES_URL + "/" + thermostat['id']
+        return self._request_action(url, json.dumps(thermostat))
+
+    def set_fan_speed(self, thermostat, fanspeed):
+        """ Set the fanspeed. Unfortunately, the API requires the complete object"""
+        self._reset_status_modified(thermostat) # Make sure only fan speed will be modified
+        for key, prop in enumerate(thermostat['properties']):
+            # noinspection SpellCheckingInspection
+            if prop['id'] == 'FanSpeed':
+                thermostat['properties'][key]['status'] = fanspeed[0].upper() + fanspeed[1:]
                 thermostat['properties'][key]['statusModified'] = True
                 thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
 
