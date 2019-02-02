@@ -9,6 +9,7 @@ This library is not affiliated with Itho Daalderop or Spider and retrieves date 
 **Thermostat**
 - Viewing the current and target temperature
 - Changing operation mode to Heat or Cool
+- Changing the fan speed
 
 **Power Plugs**
 - Viewing the energy usage and the state of power plugs
