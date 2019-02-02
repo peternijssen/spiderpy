@@ -21,6 +21,14 @@ class SpiderThermostat(SpiderDevice):
         return False
 
     @property
+    def has_fan_mode(self):
+        for prop in self.data.get('properties'):
+            if prop['id'] == 'FanSpeed':
+                return True
+
+        return False
+
+    @property
     def current_temperature(self):
         for prop in self.data.get('properties'):
             if prop['id'] == 'AmbientTemperature':
