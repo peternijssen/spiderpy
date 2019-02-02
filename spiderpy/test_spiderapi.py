@@ -36,6 +36,8 @@ def main():
         thermostat.set_temperature(17)
         print("Set to cool")
         thermostat.set_operation_mode('Cool')
+        print("Set fan speed to auto")
+        thermostat.set_fan_speed('Auto')
 
     print("Retrieve from cache")
     thermostats = api.get_thermostats()
