@@ -35,27 +35,20 @@ class SpiderApi(object):
         self._thermostats = {}
         self._power_plugs = {}
         self._last_refresh = None
+        self._access_token = None
+        self._refresh_token = None
+        self._token_expires_at = datetime.now() - timedelta(days=1)
         self._refresh_rate = refresh_rate
-        self._request_login()
-
-    def _is_token_expired(self):
-        """ Check if access token is expired """
-        if datetime.now() > self._token_expires_at:
-            self._request_access_token()
-            return True
-
-        return False
 
     def _reset_status_modified(self, thermostat):
         """ Reset all statusModified to false """
         for key, prop in enumerate(thermostat['properties']):
             # noinspection SpellCheckingInspection
-            if thermostat['properties'][key].get('statusModified', False) == True:
+            if thermostat['properties'][key].get('statusModified', False):
                 thermostat['properties'][key]['statusModified'] = False
 
     def update(self):
         """ Update the cache """
-
         current_time = int(time.time())
         last_refresh = 0 if self._last_refresh is None else self._last_refresh
 
@@ -179,9 +172,20 @@ class SpiderApi(object):
         url = POWER_PLUGS_URL + "/" + power_plug_id + "/switch"
         return self._request_action(url, "false")
 
+    def _is_authenticated(self):
+        """ Check if access token is expired """
+        if self._refresh_token is None:
+            self._request_login()
+
+        if datetime.now() > self._token_expires_at:
+            self._refresh_access_token()
+            return True
+
+        return False
+
     def _request_action(self, url, data):
         """ Perform a request to execute an action """
-        self._is_token_expired()
+        self._is_authenticated()
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
@@ -191,22 +195,22 @@ class SpiderApi(object):
             'X-Client-Library': 'SpiderPy'
         }
 
-        response = requests.request('PUT', url, data=data, headers=headers)
+        try:
+            response = requests.request('PUT', url, data=data, headers=headers)
+        except Exception as ex:
+            raise (SpiderApiException(ex))
 
         if response.status_code == 401:
-            _LOGGER.debug("Access denied. Failed to refresh?")
-            self._request_access_token()
-            self._request_action(url, data)
+            raise SpiderApiException("Access denied. Failed to refresh?")
 
         if response.status_code != 200:
-            _LOGGER.error("Unable to perform request " + str(response.content))
-            return False
+            raise SpiderApiException(f"Unable to perform action. Status code: {response.status_code}")
 
         return True
 
     def _request_update(self, url):
         """ Perform a request to update information """
-        self._is_token_expired()
+        self._is_authenticated()
 
         headers = {
             'authorization': 'Bearer ' + self._access_token,
@@ -216,16 +220,16 @@ class SpiderApi(object):
             'X-Client-Library': 'SpiderPy'
         }
 
-        response = requests.request('GET', url, headers=headers)
+        try:
+            response = requests.request('GET', url, headers=headers)
+        except Exception as ex:
+            raise (SpiderApiException(ex))
 
         if response.status_code == 401:
-            _LOGGER.debug("Access denied. Failed to refresh?")
-            self._request_access_token()
-            self._request_update(url)
+            raise SpiderApiException("Access denied. Failed to refresh?")
 
         if response.status_code != 200:
-            _LOGGER.error("Unable to perform request " + str(response.content))
-            return False
+            raise SpiderApiException(f"Unable to request update. Status code: {response.status_code}")
 
         return response.json()
 
@@ -246,20 +250,19 @@ class SpiderApi(object):
         try:
             response = requests.request(
                 'POST', AUTHENTICATE_URL, data=payload, headers=headers)
+        except Exception as ex:
+            raise (UnauthorizedException(ex))
+
+        if response.status_code != 200:
+            raise SpiderApiException(f"Unable to request login. Status code: {response.status_code}")
+        else:
             data = response.json()
+            self._access_token = data['access_token']
+            self._refresh_token = unquote(data['refresh_token'])
+            self._token_expires_in = data['expires_in']
+            self._token_expires_at = datetime.now() + timedelta(0, (int(data['expires_in']) - 20))
 
-        except Exception:
-            raise (UnauthorizedException())
-
-        if 'error' in data:
-            raise UnauthorizedException(data['error'])
-
-        self._access_token = data['access_token']
-        self._refresh_token = unquote(data['refresh_token'])
-        self._token_expires_in = data['expires_in']
-        self._token_expires_at = datetime.now() + timedelta(0, (int(data['expires_in']) - 20))
-
-    def _request_access_token(self):
+    def _refresh_access_token(self):
         """ Refresh access_token """
 
         headers = {
@@ -280,7 +283,7 @@ class SpiderApi(object):
         data = response.json()
 
         if response.status_code != 200:
-            self._request_login()
+            raise SpiderApiException(f"Unable to refresh access token. Status code: {response.status_code}")
         else:
             self._access_token = data['access_token']
             self._refresh_token = unquote(data['refresh_token'])

@@ -89,3 +89,6 @@ class SpiderThermostat(SpiderDevice):
         """ Set the fanspeed. Either 'Auto', 'Low', 'Medium', 'High', 'Boost 10', 'Boost 20', 'Boost 30'"""
         if self.is_online is True:
             self.api.set_fan_speed(self.data, fanspeed)
+
+    def __str__(self):
+        return f"{self.id} {self.name} {self.model} {self.type} {self.is_online} {self.operation_mode} {self.has_operation_mode} {self.has_fan_mode} {self.current_temperature} {self.target_temperature} {self.minimum_temperature} {self.maximum_temperature} {self.temperature_steps} {self.current_fan_speed}"
