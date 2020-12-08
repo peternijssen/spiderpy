@@ -30,4 +30,4 @@ class SpiderPowerPlug(SpiderDevice):
             self.api.turn_power_plug_off(self.id)
 
     def __str__(self):
-        return f"{self.id} {self.name} {self.model} {self.type} {self.is_online} {self.is_on} {self.is_available} {self.current_energy_consumption} {self.today_energy_consumption}"
+        return f"{self.id} {self.name} {self.model} {self.manufacturer} {self.type} {self.is_online} {self.is_on} {self.is_available} {self.current_energy_consumption} {self.today_energy_consumption}"

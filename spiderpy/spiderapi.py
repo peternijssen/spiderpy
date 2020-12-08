@@ -110,7 +110,7 @@ class SpiderApi(object):
         return self._request_action(url, json.dumps(thermostat))
 
     def set_fan_speed(self, thermostat, fanspeed):
-        """ Set the fanspeed. Unfortunately, the API requires the complete object"""
+        """ Set the fan speed. Unfortunately, the API requires the complete object"""
         self._reset_status_modified(thermostat) # Make sure only fan speed will be modified
         for key, prop in enumerate(thermostat['properties']):
             # noinspection SpellCheckingInspection

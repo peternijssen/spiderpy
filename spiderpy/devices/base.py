@@ -16,6 +16,10 @@ class SpiderDevice(object):
         return self.data.get('model')
 
     @property
+    def manufacturer(self):
+        return self.data.get('manufacturer')
+
+    @property
     def type(self):
         # 105 == Thermostat
         # 103 == PowerPlug
