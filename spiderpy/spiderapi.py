@@ -131,9 +131,9 @@ class SpiderApi(object):
 
         for power_plug in results:
             if power_plug['isSwitch']:
-                today = datetime.today().replace(hour=00, minute=00).strftime('%s')
+                today = datetime.today().replace(hour=00, minute=00, second=00).strftime('%s')
 
-                energy_url = ENERGY_MONITORING_URL + "/" + power_plug['id'] + "/?take=96&start=" + str(today) + "000"
+                energy_url = ENERGY_MONITORING_URL + "/" + power_plug['energyDeviceId'] + "/?take=96&start=" + str(today) + "000"
                 energy_results = self._request_update(energy_url)
 
                 if energy_results is False:

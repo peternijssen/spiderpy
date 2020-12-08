@@ -27,16 +27,16 @@ def main():
     for thermostat in thermostats:
         print(thermostat)
         print("Set temperature to 19 degrees")
-        thermostat.set_temperature(19)
+        #thermostat.set_temperature(19)
 
         if thermostat.has_operation_mode:
             print("Set to cool")
-            thermostat.set_operation_mode('Cool')
+            #thermostat.set_operation_mode('Cool')
             print("Set to heat")
-            thermostat.set_operation_mode('Heat')
+            #thermostat.set_operation_mode('Heat')
         if thermostat.has_fan_mode:
             print("Set fan speed to auto")
-            thermostat.set_fan_speed('Auto')
+            #thermostat.set_fan_speed('Auto')
 
     if unique_id is not None:
         print("Retrieve by id")
@@ -54,7 +54,7 @@ def main():
     for power_plug in power_plugs:
         print(power_plug)
         print("Turn on the power plug")
-        power_plug.turn_on()
+        #power_plug.turn_on()
 
     if unique_id is not None:
         print("Retrieve by id")
