@@ -21,6 +21,9 @@ Same goes for all the upcoming Spider expansions.
 ## Home Assistant
 This library is being used in [Home Assistant](https://www.home-assistant.io/components/spider/) as a component.
 
+## Homey
+There is also a [Homey integration](https://github.com/lvanderree/com.synplyworks.spider) for Spider available. It however does not use this library.
+
 ## More information about Spider (Dutch)
 [http://www.ithodaalderop.nl/spider-thermostaat/wat-is-spider](http://www.ithodaalderop.nl/spider-thermostaat/wat-is-spider)
 
