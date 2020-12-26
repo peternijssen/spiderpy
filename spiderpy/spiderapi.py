@@ -120,7 +120,12 @@ class SpiderApi(object):
                 thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
 
         url = DEVICES_URL + "/" + thermostat['id']
-        return self._request_action(url, json.dumps(thermostat))
+        try:
+            action_requested = self._request_action(url, json.dumps(thermostat))
+        # Exception will occur when Auto is not supported
+        except SpiderApiException:
+            action_requested = False
+        return action_requested
 
     def update_power_plugs(self):
         """ Retrieve power plugs """
@@ -204,7 +209,7 @@ class SpiderApi(object):
             raise SpiderApiException("Access denied. Failed to refresh?")
 
         if response.status_code != 200:
-            raise SpiderApiException(f"Unable to perform action. Status code: {response.status_code}")
+            raise SpiderApiException(f"Unable to perform action. Status code: {response.status_code}. Data: {data}")
 
         return True
 
