@@ -26,17 +26,33 @@ def main():
     print("Listing thermostats:")
     for thermostat in thermostats:
         print(thermostat)
-        print("Set temperature to 19 degrees")
-        #thermostat.set_temperature(19)
+        temp_target_curr = thermostat.target_temperature
+        temp_list = [(temp_target_curr - 1), temp_target_curr]
+        for temp in temp_list:
+            print("Set temperature to " + str(temp) + " degrees")
+            thermostat.set_temperature(temp)
+            assert (temp == thermostat.target_temperature), "Failed to set target temperature"
 
         if thermostat.has_operation_mode:
-            print("Set to cool")
-            #thermostat.set_operation_mode('Cool')
-            print("Set to heat")
-            #thermostat.set_operation_mode('Heat')
+            operation_mode_list = ['Heat', 'Cool'] if (thermostat.operation_mode == 'Cool') else ['Cool', 'Heat']
+            for operation_mode in operation_mode_list:
+                print("Set to " + operation_mode)
+                thermostat.set_operation_mode(operation_mode)
+                assert thermostat.operation_mode == operation_mode, "Failed to set operation mode"
+
         if thermostat.has_fan_mode:
-            print("Set fan speed to auto")
-            #thermostat.set_fan_speed('Auto')
+            fan_speed_curr = thermostat.current_fan_speed
+            print("Current fan speed: " + str(fan_speed_curr))
+            speed_list = ['Auto', 'Boost 10', 'Boost 20', 'Boost 30', 'High', 'Medium', 'Low']
+            for speed in speed_list:
+                print("Set fan speed to " + speed)
+                speed_set = thermostat.set_fan_speed(speed)
+                if (speed != 'Auto'):
+                    assert speed_set & (thermostat.current_fan_speed == speed), "Failed to set fan speed"
+
+            if fan_speed_curr != None:
+                print("Set fan speed back to " + str(fan_speed_curr))
+                thermostat.set_fan_speed(fan_speed_curr)
 
     if unique_id is not None:
         print("Retrieve by id")
