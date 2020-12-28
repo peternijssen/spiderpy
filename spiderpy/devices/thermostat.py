@@ -3,6 +3,12 @@ from spiderpy.devices.base import SpiderDevice
 
 # noinspection SpellCheckingInspection
 class SpiderThermostat(SpiderDevice):
+    def get_values(self, property):
+        values = []
+        for choice in property['scheduleChoices']:
+            if not choice['disabled']:
+                values.append(choice['value'])
+        return values
 
     @property
     def operation_mode(self):
@@ -11,6 +17,14 @@ class SpiderThermostat(SpiderDevice):
                 return prop['status']
 
         return "Idle"
+
+    @property
+    def operation_values(self):
+        values = []
+        for prop in self.data.get('properties'):
+            if prop['id'] == 'OperationMode':
+                values = self.get_values(prop)
+        return values
 
     @property
     def has_operation_mode(self):
@@ -27,6 +41,14 @@ class SpiderThermostat(SpiderDevice):
                 return True
 
         return False
+
+    @property
+    def fan_speed_values(self):
+        values = []
+        for prop in self.data.get('properties'):
+            if prop['id'] == 'FanSpeed':
+                values = self.get_values(prop)
+        return values
 
     @property
     def current_temperature(self):
@@ -87,8 +109,7 @@ class SpiderThermostat(SpiderDevice):
 
     def set_fan_speed(self, fanspeed):
         """ Set the fanspeed. Either 'Auto', 'Low', 'Medium', 'High', 'Boost 10', 'Boost 20', 'Boost 30'"""
-        if self.is_online is True:
-            self.api.set_fan_speed(self.data, fanspeed)
+        return self.is_online & self.api.set_fan_speed(self.data, fanspeed)
 
     def __str__(self):
         return f"{self.id} {self.name} {self.model} {self.manufacturer} {self.type} {self.is_online} {self.operation_mode} {self.has_operation_mode} {self.has_fan_mode} {self.current_temperature} {self.target_temperature} {self.minimum_temperature} {self.maximum_temperature} {self.temperature_steps} {self.current_fan_speed}"

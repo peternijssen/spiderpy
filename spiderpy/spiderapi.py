@@ -109,18 +109,23 @@ class SpiderApi(object):
         url = DEVICES_URL + "/" + thermostat['id']
         return self._request_action(url, json.dumps(thermostat))
 
-    def set_fan_speed(self, thermostat, fanspeed):
+    def set_fan_speed(self, thermostat, fan_speed):
         """ Set the fan speed. Unfortunately, the API requires the complete object"""
         self._reset_status_modified(thermostat) # Make sure only fan speed will be modified
         for key, prop in enumerate(thermostat['properties']):
             # noinspection SpellCheckingInspection
             if prop['id'] == 'FanSpeed':
-                thermostat['properties'][key]['status'] = fanspeed[0].upper() + fanspeed[1:]
+                thermostat['properties'][key]['status'] = fan_speed[0].upper() + fan_speed[1:]
                 thermostat['properties'][key]['statusModified'] = True
                 thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
 
         url = DEVICES_URL + "/" + thermostat['id']
-        return self._request_action(url, json.dumps(thermostat))
+        try:
+            action_requested = self._request_action(url, json.dumps(thermostat))
+        # Exception will occur when fan_speed is not supported
+        except SpiderApiException:
+            action_requested = False
+        return action_requested
 
     def update_power_plugs(self):
         """ Retrieve power plugs """
@@ -204,7 +209,7 @@ class SpiderApi(object):
             raise SpiderApiException("Access denied. Failed to refresh?")
 
         if response.status_code != 200:
-            raise SpiderApiException(f"Unable to perform action. Status code: {response.status_code}")
+            raise SpiderApiException(f"Unable to perform action. Status code: {response.status_code}. Data: {data}")
 
         return True
 
