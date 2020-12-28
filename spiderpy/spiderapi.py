@@ -95,7 +95,11 @@ class SpiderApi(object):
                 thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
 
         url = DEVICES_URL + "/" + thermostat['id']
-        return self._request_action(url, json.dumps(thermostat))
+        try:
+            return self._request_action(url, json.dumps(thermostat))
+        except SpiderApiException:
+            _LOGGER.error(f"Unable to set temperature to {temperature}.")
+        return False
 
     def set_operation_mode(self, thermostat, mode):
         """ Set the operation mode. Unfortunately, the API requires the complete object"""
@@ -107,7 +111,11 @@ class SpiderApi(object):
                 thermostat['properties'][key]['statusLastUpdated'] = str(datetime.now())
 
         url = DEVICES_URL + "/" + thermostat['id']
-        return self._request_action(url, json.dumps(thermostat))
+        try:
+            return self._request_action(url, json.dumps(thermostat))
+        except SpiderApiException:
+            _LOGGER.error(f"Unable to set operation mode to {mode}. Is this operation mode supported?")
+        return False
 
     def set_fan_speed(self, thermostat, fan_speed):
         """ Set the fan speed. Unfortunately, the API requires the complete object"""
@@ -121,11 +129,10 @@ class SpiderApi(object):
 
         url = DEVICES_URL + "/" + thermostat['id']
         try:
-            action_requested = self._request_action(url, json.dumps(thermostat))
-        # Exception will occur when fan_speed is not supported
+            return self._request_action(url, json.dumps(thermostat))
         except SpiderApiException:
-            action_requested = False
-        return action_requested
+            _LOGGER.error(f"Unable to set fan speed to {fan_speed}. Is this fan speed supported?")
+        return False
 
     def update_power_plugs(self):
         """ Retrieve power plugs """
@@ -170,12 +177,20 @@ class SpiderApi(object):
     def turn_power_plug_on(self, power_plug_id):
         """ Turn the power_plug on"""
         url = POWER_PLUGS_URL + "/" + power_plug_id + "/switch"
-        return self._request_action(url, "true")
+        try:
+            return self._request_action(url, "true")
+        except SpiderApiException:
+            _LOGGER.error("Unable to turn power plug on.")
+        return False
 
     def turn_power_plug_off(self, power_plug_id):
         """ Turn the power plug off"""
         url = POWER_PLUGS_URL + "/" + power_plug_id + "/switch"
-        return self._request_action(url, "false")
+        try:
+            return self._request_action(url, "false")
+        except SpiderApiException:
+            _LOGGER.error("Unable to turn power plug off.")
+        return False
 
     def _is_authenticated(self):
         """ Check if access token is expired """

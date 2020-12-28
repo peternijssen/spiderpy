@@ -30,3 +30,4 @@ There is also a [Homey integration](https://github.com/lvanderree/com.synplywork
 ## Contributors
 * [Peter Nijssen](https://github.com/peternijssen)
 * [Stefan Oude Vrielink](https://github.com/soudevrielink)
+* [Bennert van Wijs](https://github.com/bennert)

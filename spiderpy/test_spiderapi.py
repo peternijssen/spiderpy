@@ -1,5 +1,4 @@
 import argparse
-import time
 
 from spiderpy import SpiderApi
 
@@ -52,7 +51,7 @@ def main():
                 speed_set = thermostat.set_fan_speed(speed)
                 assert speed_set & (thermostat.current_fan_speed == speed), "Failed to set fan speed"
 
-            if fan_speed_curr != None:
+            if fan_speed_curr is not None:
                 print("Set fan speed back to " + str(fan_speed_curr))
                 thermostat.set_fan_speed(fan_speed_curr)
 
@@ -60,8 +59,6 @@ def main():
         print("Retrieve by id")
         thermostat = api.get_thermostat(unique_id)
         print(thermostat)
-
-    time.sleep(10)
 
     # Get power plugs
     unique_id = None
