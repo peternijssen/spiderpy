@@ -34,7 +34,9 @@ def main():
             assert (temp == thermostat.target_temperature), "Failed to set target temperature"
 
         if thermostat.has_operation_mode:
-            operation_mode_list = ['Heat', 'Cool'] if (thermostat.operation_mode == 'Cool') else ['Cool', 'Heat']
+            operation_mode_list = thermostat.operation_values
+            if operation_mode_list[-1] != thermostat.operation_mode:
+                operation_mode_list.reverse()
             for operation_mode in operation_mode_list:
                 print("Set to " + operation_mode)
                 thermostat.set_operation_mode(operation_mode)
@@ -43,12 +45,12 @@ def main():
         if thermostat.has_fan_mode:
             fan_speed_curr = thermostat.current_fan_speed
             print("Current fan speed: " + str(fan_speed_curr))
-            speed_list = ['Auto', 'Boost 10', 'Boost 20', 'Boost 30', 'High', 'Medium', 'Low']
+            speed_list = thermostat.fan_speed_values
+            speed_list.reverse()
             for speed in speed_list:
                 print("Set fan speed to " + speed)
                 speed_set = thermostat.set_fan_speed(speed)
-                if (speed != 'Auto'):
-                    assert speed_set & (thermostat.current_fan_speed == speed), "Failed to set fan speed"
+                assert speed_set & (thermostat.current_fan_speed == speed), "Failed to set fan speed"
 
             if fan_speed_curr != None:
                 print("Set fan speed back to " + str(fan_speed_curr))
