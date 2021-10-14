@@ -191,7 +191,7 @@ class SpiderApi(object):
             'authorization': 'Bearer ' + self._access_token,
             'Content-Type': 'application/json',
             'X-Client-Platform': 'android-phone',
-            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Version': '1.5.9 (3611)',
             'X-Client-Library': 'SpiderPy'
         }
 
@@ -216,7 +216,7 @@ class SpiderApi(object):
             'authorization': 'Bearer ' + self._access_token,
             'Content-Type': 'application/json',
             'X-Client-Platform': 'android-phone',
-            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Version': '1.5.9 (3611)',
             'X-Client-Library': 'SpiderPy'
         }
 
