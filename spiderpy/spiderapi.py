@@ -11,7 +11,7 @@ import requests
 from spiderpy.devices.powerplug import SpiderPowerPlug
 from spiderpy.devices.thermostat import SpiderThermostat
 
-BASE_URL = 'https://mijn.ithodaalderop.nl'
+BASE_URL = 'https://spider-api.ithodaalderop.nl'
 
 AUTHENTICATE_URL = BASE_URL + '/api/tokens'
 DEVICES_URL = BASE_URL + '/api/devices'
@@ -261,9 +261,13 @@ class SpiderApi(object):
             'X-Client-Library': 'SpiderPy'
         }
 
+        hexStr = ''
+        for char in self._user:
+            hexStr += hex(ord(char)).lstrip('0x')
+
         payload = {
             'grant_type': 'password',
-            'username': self._user,
+            'username': hexStr,
             'password': self._password
         }
 
