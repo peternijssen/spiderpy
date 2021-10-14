@@ -237,7 +237,7 @@ class SpiderApi(object):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Client-Platform': 'android-phone',
-            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Version': '1.5.9 (3611)',
             'X-Client-Library': 'SpiderPy'
         }
 
@@ -272,7 +272,7 @@ class SpiderApi(object):
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'X-Client-Platform': 'android-phone',
-            'X-Client-Version': '1.5.3 (3561)',
+            'X-Client-Version': '1.5.9 (3611)',
             'X-Client-Library': 'SpiderPy'
         }
 
