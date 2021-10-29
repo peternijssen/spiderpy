@@ -4,6 +4,8 @@ Use the same credentials as the ones you use at [https://mijn.ithodaalderop.nl ]
 
 This library is not affiliated with Itho Daalderop or Spider and retrieves date from the endpoints of the mobile application. Use at your own risk.
 
+You will need the gateway in order to communicate. If Itho Daalderop ever takes the cloud environment offline, this library will no longer function. If you are looking for a way to control your fan, I would suggest to use https://github.com/arjenhiemstra/ithowifi as it supports local control.
+
 ## Currently supports
 
 **Thermostat**
@@ -14,9 +16,6 @@ This library is not affiliated with Itho Daalderop or Spider and retrieves date 
 **Power Plugs**
 - Viewing the energy usage and the state of power plugs
 - Enabling or disabling power plug
-
-All other elements like ventilation are not supported purely because my home does not support this. So I am missing a valid test case.
-Same goes for all the upcoming Spider expansions.
 
 ## Home Assistant
 This library is being used in [Home Assistant](https://www.home-assistant.io/components/spider/) as a component.
