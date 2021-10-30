@@ -1,17 +1,13 @@
 import argparse
 
-from spiderpy import SpiderApi
+from spiderpy.spiderapi import SpiderApi
 
 
 def main():
     """Main function."""
     parser = argparse.ArgumentParser(description="Run some live tests against the API")
-    parser.add_argument(
-        'username', type=str,
-        help="Your email address")
-    parser.add_argument(
-        'password', type=str,
-        help="Your password")
+    parser.add_argument("username", type=str, help="Your email address")
+    parser.add_argument("password", type=str, help="Your password")
     args = parser.parse_args()
     username = args.username
     password = args.password
@@ -29,8 +25,8 @@ def main():
         temp_list = [(temp_target_curr - 1), temp_target_curr]
         for temp in temp_list:
             print("Set temperature to " + str(temp) + " degrees")
-            thermostat.set_temperature(temp)
-            assert (temp == thermostat.target_temperature), "Failed to set target temperature"
+            # thermostat.set_temperature(temp)
+            # assert (temp == thermostat.target_temperature), "Failed to set target temperature"
 
         if thermostat.has_operation_mode:
             operation_mode_list = thermostat.operation_values
@@ -38,8 +34,8 @@ def main():
                 operation_mode_list.reverse()
             for operation_mode in operation_mode_list:
                 print("Set to " + operation_mode)
-                thermostat.set_operation_mode(operation_mode)
-                assert thermostat.operation_mode == operation_mode, "Failed to set operation mode"
+                # thermostat.set_operation_mode(operation_mode)
+                # assert (thermostat.operation_mode == operation_mode), "Failed to set operation mode"
 
         if thermostat.has_fan_mode:
             fan_speed_curr = thermostat.current_fan_speed
@@ -69,7 +65,7 @@ def main():
     for power_plug in power_plugs:
         print(power_plug)
         print("Turn on the power plug")
-        #power_plug.turn_on()
+        # power_plug.turn_on()
 
     if unique_id is not None:
         print("Retrieve by id")
@@ -77,5 +73,5 @@ def main():
         print(power_plug)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,31 +1,37 @@
-class SpiderDevice(object):
-    def __init__(self, data, api):
+from typing import Any, Dict
+
+
+class SpiderDevice:
+    def __init__(self, data: Dict[Any, Any], api: Any) -> None:
         self.api = api
         self.data = data
 
     @property
-    def id(self):
-        return self.data.get('id')
+    def id(self) -> str:
+        return str(self.data.get("id"))
 
     @property
-    def name(self):
-        return self.data.get('name')
+    def name(self) -> str:
+        return str(self.data.get("name"))
 
     @property
-    def model(self):
-        return self.data.get('model')
+    def model(self) -> str:
+        return str(self.data.get("model"))
 
     @property
-    def manufacturer(self):
-        return self.data.get('manufacturer')
+    def manufacturer(self) -> str:
+        return str(self.data.get("manufacturer"))
 
     @property
-    def type(self):
+    def type(self) -> int:
         # 105 == Thermostat
         # 103 == PowerPlug
         # 200 == Energy Devices (Also contains PowerPlug)
-        return self.data.get('type')
+        device_type = self.data.get("type")
+        if device_type is None:
+            return 0
+        return int(device_type)
 
     @property
-    def is_online(self):
-        return self.data.get('isOnline')
+    def is_online(self) -> bool:
+        return bool(self.data.get("isOnline"))

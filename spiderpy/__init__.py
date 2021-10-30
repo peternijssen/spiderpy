@@ -1,1 +1,0 @@
-from .spiderapi import SpiderApi

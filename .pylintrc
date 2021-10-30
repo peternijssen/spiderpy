@@ -1,0 +1,25 @@
+[BASIC]
+good-names=id,tb
+
+[LOGGING]
+logging-format-style=new
+
+[MESSAGES CONTROL]
+disable=
+     logging-fstring-interpolation,
+     missing-module-docstring,
+     missing-class-docstring,
+     missing-function-docstring,
+     no-self-use,
+     too-few-public-methods,
+     too-many-public-methods,
+     too-many-arguments,
+     bad-continuation,
+     import-error,
+     unsubscriptable-object,
+     line-too-long,
+     too-many-instance-attribute,
+     too-many-instance-attributes,
+     fixme,
+     pointless-string-statement,
+     redefined-builtin

@@ -2,32 +2,39 @@ from spiderpy.devices.base import SpiderDevice
 
 
 class SpiderPowerPlug(SpiderDevice):
+    @property
+    def is_on(self) -> bool:
+        return bool(self.data.get("isSwitchedOn"))
 
     @property
-    def is_on(self):
-        return self.data.get('isSwitchedOn')
+    def is_available(self) -> bool:
+        return bool(self.data.get("isSwitchable"))
 
     @property
-    def is_available(self):
-        return self.data.get('isSwitchable')
+    def current_energy_consumption(self) -> float:
+        current_usage = self.data.get("currentUsage")
+        if current_usage is None:
+            return 0.0
+
+        return float(current_usage)
 
     @property
-    def current_energy_consumption(self):
-        return self.data.get('currentUsage')
+    def today_energy_consumption(self) -> float:
+        today_usage = self.data.get("todayUsage")
+        if today_usage is None:
+            return 0.0
 
-    @property
-    def today_energy_consumption(self):
-        return self.data.get('todayUsage')
+        return float(today_usage)
 
-    def turn_on(self):
+    def turn_on(self) -> None:
         if self.is_online is True:
-            self.data['isSwitchedOn'] = True
+            self.data["isSwitchedOn"] = True
             self.api.turn_power_plug_on(self.id)
 
-    def turn_off(self):
+    def turn_off(self) -> None:
         if self.is_online is True:
-            self.data['isSwitchedOn'] = False
+            self.data["isSwitchedOn"] = False
             self.api.turn_power_plug_off(self.id)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.id} {self.name} {self.model} {self.manufacturer} {self.type} {self.is_online} {self.is_on} {self.is_available} {self.current_energy_consumption} {self.today_energy_consumption}"
