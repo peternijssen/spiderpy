@@ -39,19 +39,18 @@ class SpiderApi:
         self._password = password
         self._thermostats: Dict[Any, Any] = {}
         self._power_plugs: Dict[Any, Any] = {}
-        self._last_refresh = 0
-        self._access_token = ""
-        self._refresh_token = ""
+        self._last_refresh: int = 0
+        self._access_token: str = ""
+        self._refresh_token: str = ""
         self._token_expires_at = datetime.now() - timedelta(days=1)
         self._token_expires_in = None
-        self._refresh_rate = refresh_rate
+        self._refresh_rate: int = refresh_rate
 
     def update(self) -> None:
         """ Update the cache """
         current_time = int(time.time())
-        last_refresh = 0 if self._last_refresh is None else self._last_refresh
 
-        if current_time >= (last_refresh + self._refresh_rate):
+        if current_time >= (self._last_refresh + self._refresh_rate):
             self.update_thermostats()
             self.update_power_plugs()
 
