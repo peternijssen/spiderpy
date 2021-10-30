@@ -46,13 +46,6 @@ class SpiderApi:
         self._token_expires_in = None
         self._refresh_rate = refresh_rate
 
-    def _reset_status_modified(self, thermostat: Dict[str, Any]) -> None:
-        """ Reset all statusModified to false """
-        for key in enumerate(thermostat["properties"]):
-            # noinspection SpellCheckingInspection
-            if thermostat["properties"][key].get("statusModified", False):
-                thermostat["properties"][key]["statusModified"] = False
-
     def update(self) -> None:
         """ Update the cache """
         current_time = int(time.time())
@@ -73,7 +66,7 @@ class SpiderApi:
 
         for thermostat in results:
             if thermostat["type"] == 105:
-                self._thermostats[thermostat["id"]] = SpiderThermostat(thermostat, self)
+                self._thermostats[thermostat["id"]] = SpiderThermostat(thermostat)
 
     def get_thermostats(self) -> ValuesView[SpiderThermostat]:
         """ Get all thermostats """
@@ -90,66 +83,43 @@ class SpiderApi:
 
         return None
 
-    def set_temperature(self, thermostat: Dict[Any, Any], temperature: float) -> bool:
+    def set_temperature(self, thermostat: SpiderThermostat, temperature: float) -> bool:
         """ Set the temperature. Unfortunately, the API requires the complete object"""
-        self._reset_status_modified(
-            thermostat
-        )  # Make sure only temperature will be modified
-        for key, prop in enumerate(thermostat["properties"]):
-            # noinspection SpellCheckingInspection
-            if prop["id"] == "SetpointTemperature":
-                thermostat["properties"][key]["status"] = temperature
-                thermostat["properties"][key]["statusModified"] = True
-                thermostat["properties"][key]["statusLastUpdated"] = str(datetime.now())
-
-        url = DEVICES_URL + "/" + thermostat["id"]
-        try:
-            return self._request_action(url, json.dumps(thermostat))
-        except SpiderApiException:
-            _LOGGER.error(f"Unable to set temperature to {temperature}.")
+        if thermostat.set_temperature(temperature):
+            url = DEVICES_URL + "/" + thermostat.id
+            try:
+                self._request_action(url, json.dumps(thermostat.data))
+                return True
+            except SpiderApiException:
+                _LOGGER.error(f"Unable to set temperature to {temperature}.")
         return False
 
-    def set_operation_mode(self, thermostat: Dict[Any, Any], mode: str) -> bool:
+    def set_operation_mode(
+        self, thermostat: SpiderThermostat, operation_mode: str
+    ) -> bool:
         """ Set the operation mode. Unfortunately, the API requires the complete object"""
-        self._reset_status_modified(
-            thermostat
-        )  # Make sure only operation mode will be modified
-        for key, prop in enumerate(thermostat["properties"]):
-            if prop["id"] == "OperationMode":
-                thermostat["properties"][key]["status"] = mode[0].upper() + mode[1:]
-                thermostat["properties"][key]["statusModified"] = True
-                thermostat["properties"][key]["statusLastUpdated"] = str(datetime.now())
-
-        url = DEVICES_URL + "/" + thermostat["id"]
-        try:
-            return self._request_action(url, json.dumps(thermostat))
-        except SpiderApiException:
-            _LOGGER.error(
-                f"Unable to set operation mode to {mode}. Is this operation mode supported?"
-            )
+        if thermostat.set_operation_mode(operation_mode):
+            url = DEVICES_URL + "/" + thermostat.id
+            try:
+                self._request_action(url, json.dumps(thermostat.data))
+                return True
+            except SpiderApiException:
+                _LOGGER.error(
+                    f"Unable to set operation mode to {operation_mode}. Is this operation mode supported?"
+                )
         return False
 
-    def set_fan_speed(self, thermostat: Dict[Any, Any], fan_speed: str) -> bool:
+    def set_fan_speed(self, thermostat: SpiderThermostat, fan_speed: str) -> bool:
         """ Set the fan speed. Unfortunately, the API requires the complete object"""
-        self._reset_status_modified(
-            thermostat
-        )  # Make sure only fan speed will be modified
-        for key, prop in enumerate(thermostat["properties"]):
-            # noinspection SpellCheckingInspection
-            if prop["id"] == "FanSpeed":
-                thermostat["properties"][key]["status"] = (
-                    fan_speed[0].upper() + fan_speed[1:]
+        if thermostat.set_fan_speed(fan_speed):
+            url = DEVICES_URL + "/" + thermostat.id
+            try:
+                self._request_action(url, json.dumps(thermostat.data))
+                return True
+            except SpiderApiException:
+                _LOGGER.error(
+                    f"Unable to set fan speed to {fan_speed}. Is this fan speed supported?"
                 )
-                thermostat["properties"][key]["statusModified"] = True
-                thermostat["properties"][key]["statusLastUpdated"] = str(datetime.now())
-
-        url = DEVICES_URL + "/" + thermostat["id"]
-        try:
-            return self._request_action(url, json.dumps(thermostat))
-        except SpiderApiException:
-            _LOGGER.error(
-                f"Unable to set fan speed to {fan_speed}. Is this fan speed supported?"
-            )
         return False
 
     def update_power_plugs(self) -> None:
@@ -187,7 +157,7 @@ class SpiderApi:
                 except IndexError:
                     _LOGGER.error("Unable to get today energy usage for power plug")
 
-                self._power_plugs[power_plug["id"]] = SpiderPowerPlug(power_plug, self)
+                self._power_plugs[power_plug["id"]] = SpiderPowerPlug(power_plug)
 
     def get_power_plugs(self) -> ValuesView[SpiderPowerPlug]:
         """ Get all power plugs """
@@ -204,22 +174,26 @@ class SpiderApi:
 
         return None
 
-    def turn_power_plug_on(self, power_plug_id: str) -> bool:
+    def turn_power_plug_on(self, power_plug: SpiderPowerPlug) -> bool:
         """ Turn the power_plug on"""
-        url = POWER_PLUGS_URL + "/" + power_plug_id + "/switch"
-        try:
-            return self._request_action(url, "true")
-        except SpiderApiException:
-            _LOGGER.error("Unable to turn power plug on.")
+        if power_plug.turn_on():
+            url = POWER_PLUGS_URL + "/" + power_plug.id + "/switch"
+            try:
+                self._request_action(url, "true")
+                return True
+            except SpiderApiException:
+                _LOGGER.error("Unable to turn power plug on.")
         return False
 
-    def turn_power_plug_off(self, power_plug_id: str) -> bool:
+    def turn_power_plug_off(self, power_plug: SpiderPowerPlug) -> bool:
         """ Turn the power plug off"""
-        url = POWER_PLUGS_URL + "/" + power_plug_id + "/switch"
-        try:
-            return self._request_action(url, "false")
-        except SpiderApiException:
-            _LOGGER.error("Unable to turn power plug off.")
+        if power_plug.turn_off():
+            url = POWER_PLUGS_URL + "/" + power_plug.id + "/switch"
+            try:
+                self._request_action(url, "false")
+                return True
+            except SpiderApiException:
+                _LOGGER.error("Unable to turn power plug off.")
         return False
 
     def _is_authenticated(self) -> bool:
@@ -233,7 +207,7 @@ class SpiderApi:
 
         return False
 
-    def _request_action(self, url: str, data: str) -> bool:
+    def _request_action(self, url: str, data: str) -> None:
         """ Perform a request to execute an action """
         self._is_authenticated()
 
@@ -257,8 +231,6 @@ class SpiderApi:
             raise SpiderApiException(
                 f"Unable to perform action. Status code: {response.status_code}. Data: {data}"
             )
-
-        return True
 
     def _request_update(self, url: str) -> Dict[Any, Any]:
         """ Perform a request to update information """

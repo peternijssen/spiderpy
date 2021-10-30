@@ -2,8 +2,7 @@ from typing import Any, Dict
 
 
 class SpiderDevice:
-    def __init__(self, data: Dict[Any, Any], api: Any) -> None:
-        self.api = api
+    def __init__(self, data: Dict[Any, Any]) -> None:
         self.data = data
 
     @property

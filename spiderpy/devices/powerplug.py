@@ -26,15 +26,17 @@ class SpiderPowerPlug(SpiderDevice):
 
         return float(today_usage)
 
-    def turn_on(self) -> None:
-        if self.is_online is True:
+    def turn_on(self) -> bool:
+        if self.is_online:
             self.data["isSwitchedOn"] = True
-            self.api.turn_power_plug_on(self.id)
+            return True
+        return False
 
-    def turn_off(self) -> None:
-        if self.is_online is True:
+    def turn_off(self) -> bool:
+        if self.is_online:
             self.data["isSwitchedOn"] = False
-            self.api.turn_power_plug_off(self.id)
+            return True
+        return False
 
     def __str__(self) -> str:
         return f"{self.id} {self.name} {self.model} {self.manufacturer} {self.type} {self.is_online} {self.is_on} {self.is_available} {self.current_energy_consumption} {self.today_energy_consumption}"
