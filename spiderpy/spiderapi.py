@@ -54,7 +54,7 @@ class SpiderApi:
             self.update_thermostats()
             self.update_power_plugs()
 
-            self._last_refresh = int(time.time())
+            self._last_refresh = current_time
 
     def update_thermostats(self) -> None:
         """ Retrieve thermostats """
