@@ -1,10 +1,12 @@
 # SpiderPy
 Unofficial Python wrapper for the Spider API, to control your Spider installation.
-Use the same credentials as the ones you use at [https://mijn.ithodaalderop.nl ](https://mijn.ithodaalderop.nl )
+Use the same credentials as the ones you use at [https://mijn.ithodaalderop.nl](https://mijn.ithodaalderop.nl)
 
 This library is not affiliated with Itho Daalderop or Spider and retrieves date from the endpoints of the mobile application. Use at your own risk.
 
-You will need the gateway in order to communicate. If Itho Daalderop ever takes the cloud environment offline, this library will no longer function. If you are looking for a way to control your fan, I would suggest to use https://github.com/arjenhiemstra/ithowifi as it supports local control.
+You will need the gateway in order to communicate. If Itho Daalderop ever takes the cloud environment offline, this library will no longer function. If you are looking for a way to control your fan, I would suggest to use [IthoWifi](https://github.com/arjenhiemstra/ithowifi) as it supports local control.
+
+*Warning: Itho Daalderop is phasing out Spider. Please read [this](https://www.ithodaalderop.nl/additionelespiderproducten) for more information*
 
 ## Currently supports
 
@@ -24,7 +26,7 @@ This library is being used in [Home Assistant](https://www.home-assistant.io/com
 There is also a [Homey integration](https://github.com/lvanderree/com.synplyworks.spider) for Spider available. It however does not use this library.
 
 ## More information about Spider (Dutch)
-[http://www.ithodaalderop.nl/spider-thermostaat/wat-is-spider](http://www.ithodaalderop.nl/spider-thermostaat/wat-is-spider)
+[https://www.ithodaalderop.nl/nl-NL/professional/productoverzicht/a07](https://www.ithodaalderop.nl/nl-NL/professional/productoverzicht/a07)
 
 ## Contributors
 * [Peter Nijssen](https://github.com/peternijssen)
