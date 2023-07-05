@@ -1,3 +1,7 @@
+# ARCHIVED  
+The spider application is no longer available as of September 1st, 2023. Therefor it has no use anymore to maintain this library.
+See https://github.com/peternijssen/spiderpy/issues/120
+
 # SpiderPy
 Unofficial Python wrapper for the Spider API, to control your Spider installation.
 Use the same credentials as the ones you use at [https://mijn.ithodaalderop.nl](https://mijn.ithodaalderop.nl)
